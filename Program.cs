@@ -1,13 +1,16 @@
 using Core;
+using Core.Services;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
-
+/*
 builder.Services.Configure<FruitOptions>(options =>
 {
     options.Name = "watermelon";
 });
+*/
 
+builder.Services.AddSingleton<IResponseFormatter, HtmlResponseFormatter>();
 var app = builder.Build();
 
 /*
@@ -62,8 +65,19 @@ app.Use(async (context, next) =>
 //    FruitOptions options = FruitOptions.Value;
 //    await context.Response.WriteAsync($"{options.Name}, {options.Color}");
 //});
-app.UseMiddleware<FruitMiddleware>();
+//app.UseMiddleware<FruitMiddleware>();
 
+//IResponseFormatter formatter = new TextResponseFormatter();
+
+app.MapGet("/formatter1", async (HttpContext context, IResponseFormatter formatter) =>
+{
+    await formatter.Format(context, "Fromatter 1");
+});
+
+app.MapGet("/formatter2", async (HttpContext context, IResponseFormatter formatter) =>
+{
+    await formatter.Format(context, "Fromatter 2");
+});
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
